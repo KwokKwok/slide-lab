@@ -1,5 +1,14 @@
-import Quadrant from './components'
+import dynamic from 'next/dynamic'
 import './page.css'
+
+const Quadrant = dynamic(() => import('./components'), {
+  ssr: false
+})
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
 
 export const metadata = {
   title: '象限编辑器 | SlideLab',
@@ -15,10 +24,6 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
   },
   alternates: {
     canonical: 'https://slidelab.vercel.app/quadrant',

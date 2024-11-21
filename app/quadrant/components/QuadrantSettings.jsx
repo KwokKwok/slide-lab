@@ -241,7 +241,7 @@ const QuadrantSettings = ({ open, onClose, initialSettings, onSave }) => {
                 <Space className="w-full">
                   <Popconfirm
                     title="确认清除数据"
-                    description="确定���清除所有数据吗？此操作不可恢复。"
+                    description="确定要清除所有数据吗？此操作不可恢复。"
                     onConfirm={() => {
                       localStorage.clear();
                       window.location.reload();

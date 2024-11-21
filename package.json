@@ -3,15 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106",
-    "next": "15.0.3"
+    "@ant-design/icons": "^5.5.1",
+    "@heroicons/react": "^2.2.0",
+    "@iconify/react": "^5.0.2",
+    "@radix-ui/react-context-menu": "^2.2.2",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.2",
+    "@radix-ui/react-slot": "^1.1.0",
+    "antd": "^5.22.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lodash-es": "^4.17.21",
+    "lucide-react": "^0.460.0",
+    "next": "14.2.18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-draggable": "^4.4.6",
+    "react-router-dom": "^6.28.0",
+    "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
     "postcss": "^8",

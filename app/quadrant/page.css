@@ -1,0 +1,64 @@
+@import 'antd/dist/reset.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --axis-start-color: #2d3efa50;
+  --dashed-line-color: #2d3efa50;
+  --axis-end-color: #2d3efaff;
+}
+
+/* 添加垂直文字样式 */
+.writing-vertical-lr {
+  writing-mode: vertical-lr;
+}
+
+/* 添加网格背景样式 */
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+    linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+@layer utilities {
+  .bg-grid {
+    background-size: 40px 40px;
+    background-image: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.05) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  }
+}
+
+/* 修改渐变色的类名，使用 CSS 变量 */
+.bg-axis-gradient-to-top {
+  background: linear-gradient(
+    to top,
+    var(--axis-start-color),
+    var(--axis-end-color)
+  );
+}
+
+.bg-axis-gradient-to-right {
+  background: linear-gradient(
+    to right,
+    var(--axis-start-color),
+    var(--axis-end-color)
+  );
+}

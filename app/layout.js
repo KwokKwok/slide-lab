@@ -1,9 +1,10 @@
-import { Inter } from 'next/font/google'
+import { Lato } from 'next/font/google'
 import './globals.css'
 import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
+import { Analytics } from "@vercel/analytics/react"
 
-const inter = Inter({ subsets: ['latin'] })
+const lato = Lato({ subsets: ['latin'], weight: ['400', '700'] })
 
 export const metadata = {
   title: 'Create Next App',
@@ -13,7 +14,8 @@ export const metadata = {
 export default function RootLayout ({ children }) {
   return (
     <html lang="zh-CN">
-      <body className={inter.className}>
+      <Analytics />
+      <body className={lato.className}>
         <ConfigProvider
           locale={zhCN}
           theme={{

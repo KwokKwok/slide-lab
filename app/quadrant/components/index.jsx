@@ -68,10 +68,10 @@ const LabelEditor = ({ label, onSave, onClose, setCategoryColors }) => {
   };
 
   return (
-    <DraggableDialog title="编辑标签" onClose={handleCancel}>
+    <DraggableDialog title="编辑分类" onClose={handleCancel}>
       <div className="w-[320px] space-y-4">
         <div>
-          <div className="mb-2 text-sm text-gray-600">标签名称</div>
+          <div className="mb-2 text-sm text-gray-600">分类名称</div>
           <Input
             value={localLabel.name}
             onChange={e =>
@@ -382,10 +382,11 @@ const Quadrant = () => {
             className="px-2 py-1 text-sm cursor-pointer text-gray-800 hover:bg-gray-100 rounded"
             onClick={() => {
               Modal.confirm({
-                title: '新建项目',
+                title: '新增项目',
                 icon: null,
                 content: (
                   <Input
+                    id="project-name"
                     placeholder="请输入项目名称"
                     onChange={e => {
                       Modal.confirm.update({
@@ -399,9 +400,7 @@ const Quadrant = () => {
                 okText: '确定',
                 cancelText: '取消',
                 onOk: () => {
-                  const name = document.querySelector(
-                    '.ant-modal-content input'
-                  ).value;
+                  const name = document.querySelector('#project-name').value;
                   if (name.trim()) {
                     const newProject = createProject(name, label.category);
                     const updatedProjects = [...projects, newProject];
@@ -412,24 +411,26 @@ const Quadrant = () => {
               });
             }}
           >
-            新建项目
+            新增项目
           </ContextMenu.Item>
           <ContextMenu.Separator className="h-[1px] bg-gray-200 my-1" />
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer text-gray-800 hover:bg-gray-100 rounded"
             onClick={() => setEditingLabel({ ...label, index })}
           >
-            编辑标签
+            编辑分类
           </ContextMenu.Item>
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer text-gray-800 hover:bg-gray-100 rounded"
             onClick={() => {
               Modal.confirm({
-                title: '添加新标签',
+                title: '添加新分类',
                 icon: null,
                 content: (
                   <Input
-                    placeholder="请输入新标签名称"
+                    id="category-name"
+                    autoFocus
+                    placeholder="请输入新分类名称"
                     onChange={e => {
                       Modal.confirm.update({
                         okButtonProps: {
@@ -442,9 +443,7 @@ const Quadrant = () => {
                 okText: '确定',
                 cancelText: '取消',
                 onOk: () => {
-                  const name = document.querySelector(
-                    '.ant-modal-content input'
-                  ).value;
+                  const name = document.querySelector('#category-name').value;
                   if (name.trim()) {
                     addLabel({
                       name,
@@ -458,14 +457,14 @@ const Quadrant = () => {
               });
             }}
           >
-            添加新标签
+            添加新分类
           </ContextMenu.Item>
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded text-red-500"
             onClick={() => {
               Modal.confirm({
                 title: '删除确认',
-                content: '确定要删除此标签吗？',
+                content: '确定要删除此分类吗？分类下所有项目也会同步删除',
                 okText: '确定',
                 cancelText: '取消',
                 onOk: () => {
@@ -476,7 +475,7 @@ const Quadrant = () => {
               });
             }}
           >
-            删除标签
+            删除分类
           </ContextMenu.Item>
         </ContextMenu.Content>
       </ContextMenu.Portal>

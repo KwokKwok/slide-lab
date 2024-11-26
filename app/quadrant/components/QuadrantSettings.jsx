@@ -305,12 +305,51 @@ const QuadrantSettings = ({ open, onClose, initialSettings, onSave }) => {
           ]}
         />
 
-        {/* 操作按钮 */}
-        <div className="flex justify-end gap-2 pt-4">
-          <Button onClick={onClose}>取消</Button>
-          <Button type="primary" onClick={handleSave}>
-            确定
-          </Button>
+        {/* 修改底部布局 */}
+        <div className="space-y-4">
+          {/* 操作按钮 */}
+          <div className="flex justify-end gap-2">
+            <Button onClick={onClose}>取消</Button>
+            <Button type="primary" onClick={handleSave}>
+              确定
+            </Button>
+          </div>
+
+          {/* 分割线 */}
+          <div className="border-t border-gray-100" />
+
+          {/* 底部信息 */}
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="italic inline-flex items-center gap-1">
+              made on earth, with
+              <a
+                href="https://www.cursor.com"
+                target="_blank"
+                className="inline-flex items-center gap-[2px] hover:text-gray-800 transition-colors group"
+                title="Cursor"
+              >
+                Cursor
+              </a>
+              <span className="mx-1">·</span>
+              <a
+                href="https://github.com/KwokKwok/slide-lab/blob/main/LICENSE"
+                target="_blank"
+                className="hover:text-gray-800 transition-colors"
+              >
+                MIT License
+              </a>
+            </span>
+            <a
+              href="https://github.com/KwokKwok/slide-lab"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 hover:text-gray-800 transition-colors"
+              title="View source"
+            >
+              <Icon icon="mdi:github" className="w-5 h-5" />
+              <span>View Source</span>
+            </a>
+          </div>
         </div>
       </div>
     </DraggableDialog>

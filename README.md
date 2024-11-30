@@ -11,7 +11,6 @@
 ### 已完成
 
 - [x] 象限编辑器
-- [x] docker适配
 
 ### 开发环境
 
@@ -21,7 +20,7 @@ npm run dev
 
 打开 [http://localhost:3000](http://localhost:3000) 查看页面
 
-### docker运行
+### Docker 运行
 
 构建容器镜像：
 
@@ -42,7 +41,7 @@ docker tag ghcr.io/growdu/slide-tab/slide-tab:v0.1 slide-tab
 docker run -d -p 3000:3000 slide-tab
 ```
 
-以docker-compose启动容器，docker-compose.yaml配置文件如下：
+以 docker-compose 启动容器，`docker-compose.yaml` 配置文件如下：
 
 ```yaml
 version: "3.8"

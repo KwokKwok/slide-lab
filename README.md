@@ -19,3 +19,43 @@ npm run dev
 ```
 
 打开 [http://localhost:3000](http://localhost:3000) 查看页面
+
+### Docker 运行
+
+构建容器镜像：
+
+```shell
+docker build -t slide-tab .
+```
+
+如果不想自己构建，也可以直接下载构建好的容器：
+
+```shell
+docker pull ghcr.io/growdu/slide-tab/slide-tab:v0.1
+docker tag ghcr.io/growdu/slide-tab/slide-tab:v0.1 slide-tab
+```
+
+启动容器：
+
+```shell
+docker run -d -p 3000:3000 slide-tab
+```
+
+以 docker-compose 启动容器，`docker-compose.yaml` 配置文件如下：
+
+```yaml
+version: "3.8"
+services:
+  nginx:
+    image: slide-tab:latest
+    restart: unless-stopped
+    ports:
+      - 3001:3000
+networks: {}
+```
+
+执行如下命令：
+
+```shell
+docker-compose up -d
+```

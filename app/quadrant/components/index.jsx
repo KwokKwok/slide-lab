@@ -820,7 +820,7 @@ const Quadrant = () => {
 
   return (
     <ConfigProvider getPopupContainer={node => node.parentNode}>
-      <div className="w-[100dvw] h-[100dvh] px-12 py-8">
+      <div className="w-screen h-screen px-12 py-8">
         <button
           onClick={() => setShowSettings(true)}
           className="absolute top-2 right-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -933,7 +933,7 @@ const Quadrant = () => {
           </div>
 
           {/* 主要内容区域 */}
-          <div className="relative w-full min-h-[80dvh] bg-white shadow-lg p-8 mx-auto my-12">
+          <div className="relative w-full min-h-[80vh] bg-white shadow-lg p-8 mx-auto my-12">
             {/* 四个象限背景 */}
             <div className="absolute quadrant-container inset-0 grid grid-cols-2 grid-rows-2">
               <QuadrantBox position="topLeft" />

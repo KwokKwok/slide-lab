@@ -59,3 +59,19 @@ networks: {}
 ```shell
 docker-compose up -d
 ```
+
+
+### 快捷键
+
+项目操作(选中某个项目)：
+
+- Use <kbd>N</kbd> 新增同分类项目
+- Use <kbd>E</kbd> 编辑选中项目
+- Use <kbd>D</kbd> / <kbd>Delete</kbd> / <kbd>Backspace</kbd> 删除选中项目
+- Use <kbd>H</kbd> 隐藏同分类所有项目
+
+分类操作：
+
+- Use <kbd>Alt</kbd> + <kbd>N</kbd> 新增分类
+- Use <kbd>Alt</kbd> + <kbd>E</kbd> 编辑选中项目分类
+- Use <kbd>Alt</kbd> + <kbd>D</kbd> / <kbd>Delete</kbd> / <kbd>Backspace</kbd> 删除选中项目

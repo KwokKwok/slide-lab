@@ -199,10 +199,16 @@ const Quadrant = () => {
       }
     };
 
+    const hideContextMenu = e => {
+      e.preventDefault();
+    } 
+
     window.addEventListener('keydown', handKeyDown);
+    window.addEventListener('contextmenu', hideContextMenu);
 
     return () => {
       window.removeEventListener('keydown', handKeyDown);
+      window.removeEventListener('contextmenu', hideContextMenu);
     };
   }, [selectedProject, editMode, labels, editingLabel, editingProject]);
 

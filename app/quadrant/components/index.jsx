@@ -140,12 +140,12 @@ const Quadrant = () => {
   const updateEditProject = project => {
     setEditMode(!!project);
     setEditingProject(project);
-  }
+  };
 
   const updateEditLabel = label => {
     setEditMode(!!label);
     setEditingLabel(label);
-  }
+  };
 
   useEffect(() => {
     initLabels();
@@ -160,38 +160,59 @@ const Quadrant = () => {
         setShowInput(false);
         updateEditLabel(null);
       } else if (!editMode) {
-        if (e.code === "KeyS") { // 设置
+        if (e.code === 'KeyS') {
+          // 设置
           setShowSettings(true);
-        } else if (e.code === "KeyN") { // 新增
-          if (e.altKey) { // 新增分类
+        } else if (e.code === 'KeyN') {
+          // 新增
+          if (e.altKey) {
+            // 新增分类
             onAddLabel();
-          } else if (selectedProject) { // 新增同分类项目
-            onAddProject(selectedProject.category); 
+          } else if (selectedProject) {
+            // 新增同分类项目
+            onAddProject(selectedProject.category);
           }
-        } else if (e.code === "KeyE") { // 编辑
+        } else if (e.code === 'KeyE') {
+          // 编辑
           if (selectedProject) {
-            if (e.altKey) { // 编辑选中分类
-              let index = labels.findIndex(l => l.category === selectedProject.category);
+            if (e.altKey) {
+              // 编辑选中分类
+              let index = labels.findIndex(
+                l => l.category === selectedProject.category
+              );
               if (index === -1) return;
-              
-              updateEditLabel({ ...labels[index], index })
-            } else { // 编辑选中项目
+
+              updateEditLabel({ ...labels[index], index });
+            } else {
+              // 编辑选中项目
               updateEditProject(selectedProject);
             }
           }
-        } else if (e.code === "Delete" || e.code === "Backspace" || e.code === "KeyD") { // 删除
+        } else if (
+          e.code === 'Delete' ||
+          e.code === 'Backspace' ||
+          e.code === 'KeyD'
+        ) {
+          // 删除
           if (!selectedProject) return;
 
-          if (e.altKey) { // 删除选中分类
-            let index = labels.findIndex(l => l.category === selectedProject.category);
+          if (e.altKey) {
+            // 删除选中分类
+            let index = labels.findIndex(
+              l => l.category === selectedProject.category
+            );
             onDelLable(index);
-          } else { // 删除选中项目
+          } else {
+            // 删除选中项目
             onDelProject(selectedProject);
           }
-        } else if (e.code === "KeyH") { // 隐藏选中项目分类
+        } else if (e.code === 'KeyH') {
+          // 隐藏选中项目分类
           if (!selectedProject) return;
 
-          let index = labels.findIndex(l => l.category === selectedProject.category);
+          let index = labels.findIndex(
+            l => l.category === selectedProject.category
+          );
           if (index !== -1) {
             handleLabelToggle(null, index);
           }
@@ -201,7 +222,7 @@ const Quadrant = () => {
 
     const hideContextMenu = e => {
       e.preventDefault();
-    } 
+    };
 
     window.addEventListener('keydown', handKeyDown);
     window.addEventListener('contextmenu', hideContextMenu);
@@ -377,17 +398,12 @@ const Quadrant = () => {
     }
   };
 
-  const onAddProject = (category) => {
+  const onAddProject = category => {
     setEditMode(true);
     Modal.confirm({
       title: '新增项目',
       icon: null,
-      content: (
-        <Input
-          id="project-name"
-          placeholder="请输入项目名称"
-        />
-      ),
+      content: <Input id="project-name" placeholder="请输入项目名称" />,
       okText: '确定',
       cancelText: '取消',
       onOk: () => {
@@ -399,13 +415,13 @@ const Quadrant = () => {
           saveProjects(updatedProjects);
         }
       },
-      afterClose: ()=>{
+      afterClose: () => {
         setEditMode(false);
       },
     });
   };
 
-  const onDelProject = (project) => {
+  const onDelProject = project => {
     Modal.confirm({
       title: '删除确认',
       content: `确定要删除 ${project.name} 吗？`,
@@ -417,7 +433,7 @@ const Quadrant = () => {
         saveProjects(updatedProjects);
         setSelectedProject(null);
       },
-      afterClose: ()=>{
+      afterClose: () => {
         setEditMode(false);
       },
     });
@@ -429,11 +445,7 @@ const Quadrant = () => {
       title: '添加新分类',
       icon: null,
       content: (
-        <Input
-          id="category-name"
-          autoFocus
-          placeholder="请输入新分类名称"
-        />
+        <Input id="category-name" autoFocus placeholder="请输入新分类名称" />
       ),
       okText: '确定',
       cancelText: '取消',
@@ -449,13 +461,13 @@ const Quadrant = () => {
           setCategoryColors(getCategoryColors());
         }
       },
-      afterClose: ()=>{
+      afterClose: () => {
         setEditMode(false);
       },
     });
   };
 
-  const onDelLable = (index) => {
+  const onDelLable = index => {
     Modal.confirm({
       title: '删除确认',
       content: '确定要删除此分类吗？分类下所有项目也会同步删除',
@@ -466,7 +478,7 @@ const Quadrant = () => {
         setLabels(getDefaultLabels());
         setCategoryColors(getCategoryColors());
       },
-      afterClose: ()=>{
+      afterClose: () => {
         setEditMode(false);
       },
     });
@@ -526,7 +538,7 @@ const Quadrant = () => {
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer text-gray-800 hover:bg-gray-100 rounded"
             onClick={() => {
-              onAddProject(label.category)
+              onAddProject(label.category);
             }}
           >
             新增项目
@@ -541,7 +553,7 @@ const Quadrant = () => {
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer text-gray-800 hover:bg-gray-100 rounded"
             onClick={() => {
-              onAddLabel()
+              onAddLabel();
             }}
           >
             添加新分类
@@ -715,14 +727,20 @@ const Quadrant = () => {
       };
 
   // 添加一个可复用的项目预览组件
-  const ProjectPreview = ({ project, name, isPreview = false, phase }) => {
+  const ProjectItem = ({
+    project,
+    name,
+    isPreview = false,
+    phase,
+    selected = false,
+  }) => {
     const textColor = getCategoryTextColors()[project.category] || '#ffffff';
 
     return (
       <div
-        className={`relative flex items-center whitespace-pre-line text-center shadow-lg select-none rounded-full text-sm ${
+        className={`relative flex items-center whitespace-pre-line text-center shadow-lg transition-all select-none rounded-full text-sm ${
           isPreview ? '' : 'hover:scale-105 cursor-move'
-        }`}
+        } ${selected ? 'border-2 border-white/50 scale-105' : ''}`}
         style={{
           backgroundColor: getCategoryColor(project.category),
           color: textColor,
@@ -875,7 +893,7 @@ const Quadrant = () => {
           <div className="space-y-2">
             <div className="text-sm font-medium text-gray-700">效果预览</div>
             <div className="relative w-full h-24 bg-gray-50 rounded-lg border flex items-center justify-center">
-              <ProjectPreview
+              <ProjectItem
                 project={project}
                 name={name}
                 phase={phase}
@@ -1010,7 +1028,10 @@ const Quadrant = () => {
           </div>
 
           {/* 主要内容区域 */}
-          <div className="relative w-full min-h-[80vh] bg-white shadow-lg p-8 mx-auto my-12" onClick={e => setSelectedProject(null)}>
+          <div
+            className="relative w-full min-h-[80vh] bg-white shadow-lg p-8 mx-auto my-12"
+            onClick={e => setSelectedProject(null)}
+          >
             {/* 四个象限背景 */}
             <div className="absolute quadrant-container inset-0 grid grid-cols-2 grid-rows-2">
               <QuadrantBox position="topLeft" />
@@ -1102,7 +1123,6 @@ const Quadrant = () => {
                       transform: `translate(-50%, -50%)`,
                       touchAction: 'none',
                       width: 'auto',
-                      border: project.id === selectedProject?.id ? '2px solid #000' : 'none',
                     }}
                     className={`absolute z-30 ${
                       isVisible ? 'transition-opacity' : 'transition-none'
@@ -1110,10 +1130,11 @@ const Quadrant = () => {
                     onClick={e => handleClick(e, project)}
                     onContextMenu={e => onDelLable(project)}
                   >
-                    <ProjectPreview
+                    <ProjectItem
                       project={project}
                       name={project.name}
                       phase={project.phase}
+                      selected={project.id === selectedProject?.id}
                     />
                   </div>
                 </DraggableCore>

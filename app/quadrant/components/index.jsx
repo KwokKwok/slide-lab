@@ -25,7 +25,6 @@ import { DraggableDialog } from './DraggableDialog';
 import QuadrantSettings from './QuadrantSettings';
 import { Button, Input, ColorPicker, Space, Modal } from 'antd';
 import { ConfigProvider } from 'antd';
-import { throttle } from 'lodash-es';
 
 const LabelEditor = ({ label, onSave, onClose, setCategoryColors }) => {
   const [localLabel, setLocalLabel] = useState({
@@ -107,6 +106,7 @@ const LabelEditor = ({ label, onSave, onClose, setCategoryColors }) => {
 
 const Quadrant = () => {
   const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [showInput, setShowInput] = useState(false);
   const [labels, setLabels] = useState(getDefaultLabels());
   const [editingLabel, setEditingLabel] = useState(null);
@@ -129,12 +129,23 @@ const Quadrant = () => {
   });
   const [applyAxisColorToText, setApplyAxisColorToText] = useState(true);
   const [dashedLineColor, setDashedLineColor] = useState('#2d3efa50'); // 默认虚线颜色
+  const [editMode, setEditMode] = useState(false);
   const projectRefs = useRef({}); // 添加这行来存储每个项目的 ref
 
   // 添加一个 ref 来存储 RAF 的 ID
   const rafRef = useRef(null);
   // 添加一个 ref 来存储最新的拖动数据
   const dragDataRef = useRef(null);
+
+  const updateEditProject = project => {
+    setEditMode(!!project);
+    setEditingProject(project);
+  }
+
+  const updateEditLabel = label => {
+    setEditMode(!!label);
+    setEditingLabel(label);
+  }
 
   useEffect(() => {
     initLabels();
@@ -143,16 +154,63 @@ const Quadrant = () => {
     setLabels(getDefaultLabels());
     setCategoryColors(getCategoryColors());
 
-    // 添加 ESC 键监听
-    const handleEsc = e => {
-      if (e.key === 'Escape') {
+    // 添加键盘事件监听
+    const handKeyDown = e => {
+      if (e.code === 'Escape') {
         setShowInput(false);
-        setEditingLabel(null);
+        updateEditLabel(null);
+      } else if (!editMode) {
+        if (e.code === "KeyS") { // 设置
+          setShowSettings(true);
+        } else if (e.code === "KeyN") { // 新增
+          if (e.altKey) { // 新增分类
+            onAddLabel();
+          } else if (selectedProject) { // 新增同分类项目
+            onAddProject(selectedProject.category); 
+          }
+        } else if (e.code === "KeyE") { // 编辑
+          if (selectedProject) {
+            if (e.altKey) { // 编辑选中分类
+              let index = labels.findIndex(l => l.category === selectedProject.category);
+              if (index === -1) return;
+              
+              updateEditLabel({ ...labels[index], index })
+            } else { // 编辑选中项目
+              updateEditProject(selectedProject);
+            }
+          }
+        } else if (e.code === "Delete" || e.code === "Backspace" || e.code === "KeyD") { // 删除
+          if (!selectedProject) return;
+
+          if (e.altKey) { // 删除选中分类
+            let index = labels.findIndex(l => l.category === selectedProject.category);
+            onDelLable(index);
+          } else { // 删除选中项目
+            onDelProject(selectedProject);
+          }
+        } else if (e.code === "KeyH") { // 隐藏选中项目分类
+          if (!selectedProject) return;
+
+          let index = labels.findIndex(l => l.category === selectedProject.category);
+          if (index !== -1) {
+            handleLabelToggle(null, index);
+          }
+        }
       }
     };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, []);
+
+    const hideContextMenu = e => {
+      e.preventDefault();
+    } 
+
+    window.addEventListener('keydown', handKeyDown);
+    window.addEventListener('contextmenu', hideContextMenu);
+
+    return () => {
+      window.removeEventListener('keydown', handKeyDown);
+      window.removeEventListener('contextmenu', hideContextMenu);
+    };
+  }, [selectedProject, editMode, labels, editingLabel, editingProject]);
 
   useEffect(() => {
     const savedMode = localStorage.getItem('quadrantMode');
@@ -254,7 +312,7 @@ const Quadrant = () => {
 
   // 处理标签点击切换显示状态
   const handleLabelToggle = (e, index) => {
-    e.stopPropagation(); // 防止触发新项目
+    e?.stopPropagation(); // 防止触发新项目
     const newLabels = [...labels];
     newLabels[index] = {
       ...newLabels[index],
@@ -306,14 +364,48 @@ const Quadrant = () => {
     });
   };
 
-  // 修改项目
-  const handleDoubleClick = (e, project) => {
+  // 项目点击事件
+  const handleClick = (e, project) => {
     e.stopPropagation();
-    setEditingProject(project);
+    switch (e.detail) {
+      case 1: // click 选中
+        setSelectedProject(project);
+        break;
+      case 2: // double click 编辑
+        updateEditProject(project);
+        break;
+    }
   };
 
-  const handleContextMenu = (e, project) => {
-    e.preventDefault();
+  const onAddProject = (category) => {
+    setEditMode(true);
+    Modal.confirm({
+      title: '新增项目',
+      icon: null,
+      content: (
+        <Input
+          id="project-name"
+          placeholder="请输入项目名称"
+        />
+      ),
+      okText: '确定',
+      cancelText: '取消',
+      onOk: () => {
+        const name = document.querySelector('#project-name').value;
+        if (name.trim()) {
+          const newProject = createProject(name, category);
+          const updatedProjects = [...projects, newProject];
+          setProjects(updatedProjects);
+          saveProjects(updatedProjects);
+        }
+      },
+      afterClose: ()=>{
+        setEditMode(false);
+      },
+    });
+  };
+
+  const onDelProject = (project) => {
     Modal.confirm({
       title: '删除确认',
       content: `确定要删除 ${project.name} 吗？`,
@@ -323,6 +415,59 @@ const Quadrant = () => {
         const updatedProjects = projects.filter(p => p.id !== project.id);
         setProjects(updatedProjects);
         saveProjects(updatedProjects);
+        setSelectedProject(null);
+      },
+      afterClose: ()=>{
+        setEditMode(false);
+      },
+    });
+  };
+
+  const onAddLabel = () => {
+    setEditMode(true);
+    Modal.confirm({
+      title: '添加新分类',
+      icon: null,
+      content: (
+        <Input
+          id="category-name"
+          autoFocus
+          placeholder="请输入新分类名称"
+        />
+      ),
+      okText: '确定',
+      cancelText: '取消',
+      onOk: () => {
+        const name = document.querySelector('#category-name').value;
+        if (name.trim() && !labels.find(l => l.name === name)) {
+          addLabel({
+            name,
+            category: name,
+            type: 'label',
+          });
+          setLabels(getDefaultLabels());
+          setCategoryColors(getCategoryColors());
+        }
+      },
+      afterClose: ()=>{
+        setEditMode(false);
+      },
+    });
+  };
+
+  const onDelLable = (index) => {
+    Modal.confirm({
+      title: '删除确认',
+      content: '确定要删除此分类吗？分类下所有项目也会同步删除',
+      okText: '确定',
+      cancelText: '取消',
+      onOk: () => {
+        deleteLabel(index);
+        setLabels(getDefaultLabels());
+        setCategoryColors(getCategoryColors());
+      },
+      afterClose: ()=>{
+        setEditMode(false);
       },
     });
   };
@@ -336,7 +481,7 @@ const Quadrant = () => {
     );
     setProjects(updatedProjects);
     saveProjects(updatedProjects);
-    setEditingProject(null);
+    updateEditProject(null);
   };
 
   const handleLabelSave = updatedLabel => {
@@ -349,7 +494,7 @@ const Quadrant = () => {
       updateCategoryTextColor(updatedLabel.category, updatedLabel.textColor);
       setLabels(getDefaultLabels());
       setCategoryColors(getCategoryColors());
-      setEditingLabel(null);
+      updateEditLabel(null);
     }
   };
 
@@ -381,34 +526,7 @@ const Quadrant = () => {
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer text-gray-800 hover:bg-gray-100 rounded"
             onClick={() => {
-              Modal.confirm({
-                title: '新增项目',
-                icon: null,
-                content: (
-                  <Input
-                    id="project-name"
-                    placeholder="请输入项目名称"
-                    onChange={e => {
-                      Modal.confirm.update({
-                        okButtonProps: {
-                          disabled: !e.target.value.trim(),
-                        },
-                      });
-                    }}
-                  />
-                ),
-                okText: '确定',
-                cancelText: '取消',
-                onOk: () => {
-                  const name = document.querySelector('#project-name').value;
-                  if (name.trim()) {
-                    const newProject = createProject(name, label.category);
-                    const updatedProjects = [...projects, newProject];
-                    setProjects(updatedProjects);
-                    saveProjects(updatedProjects);
-                  }
-                },
-              });
+              onAddProject(label.category)
             }}
           >
             新增项目
@@ -416,45 +534,14 @@ const Quadrant = () => {
           <ContextMenu.Separator className="h-[1px] bg-gray-200 my-1" />
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer text-gray-800 hover:bg-gray-100 rounded"
-            onClick={() => setEditingLabel({ ...label, index })}
+            onClick={() => updateEditLabel({ ...label, index })}
           >
             编辑分类
           </ContextMenu.Item>
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer text-gray-800 hover:bg-gray-100 rounded"
             onClick={() => {
-              Modal.confirm({
-                title: '添加新分类',
-                icon: null,
-                content: (
-                  <Input
-                    id="category-name"
-                    autoFocus
-                    placeholder="请输入新分类名称"
-                    onChange={e => {
-                      Modal.confirm.update({
-                        okButtonProps: {
-                          disabled: !e.target.value.trim(),
-                        },
-                      });
-                    }}
-                  />
-                ),
-                okText: '确定',
-                cancelText: '取消',
-                onOk: () => {
-                  const name = document.querySelector('#category-name').value;
-                  if (name.trim()) {
-                    addLabel({
-                      name,
-                      category: name,
-                      type: 'label',
-                    });
-                    setLabels(getDefaultLabels());
-                    setCategoryColors(getCategoryColors());
-                  }
-                },
-              });
+              onAddLabel()
             }}
           >
             添加新分类
@@ -462,17 +549,7 @@ const Quadrant = () => {
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded text-red-500"
             onClick={() => {
-              Modal.confirm({
-                title: '删除确认',
-                content: '确定要删除此分类吗？分类下所有项目也会同步删除',
-                okText: '确定',
-                cancelText: '取消',
-                onOk: () => {
-                  deleteLabel(index);
-                  setLabels(getDefaultLabels());
-                  setCategoryColors(getCategoryColors());
-                },
-              });
+              onDelLable(index);
             }}
           >
             删除分类
@@ -695,7 +772,7 @@ const Quadrant = () => {
       const updatedProjects = projects.map(p => ({ ...p, phase }));
       setProjects(updatedProjects);
       saveProjects(updatedProjects);
-      setEditingProject(prev => ({ ...prev, phase }));
+      updateEditProject(prev => ({ ...prev, phase }));
     };
 
     const applyPhaseToSamePhaseProjects = () => {
@@ -704,7 +781,7 @@ const Quadrant = () => {
       );
       setProjects(updatedProjects);
       saveProjects(updatedProjects);
-      setEditingProject(prev => ({ ...prev, phase }));
+      updateEditProject(prev => ({ ...prev, phase }));
     };
 
     const clearColor = key => {
@@ -712,7 +789,7 @@ const Quadrant = () => {
     };
 
     return (
-      <DraggableDialog title="编辑项目" onClose={() => setEditingProject(null)}>
+      <DraggableDialog title="编辑项目" onClose={() => updateEditProject(null)}>
         <div className="w-[500px] space-y-6">
           {/* 阶段标记设置 */}
           <div className="space-y-2">
@@ -808,7 +885,7 @@ const Quadrant = () => {
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button onClick={() => setEditingProject(null)}>取消</Button>
+            <Button onClick={() => updateEditProject(null)}>取消</Button>
             <Button type="primary" onClick={handleSave}>
               保存
             </Button>
@@ -933,7 +1010,7 @@ const Quadrant = () => {
           </div>
 
           {/* 主要内容区域 */}
-          <div className="relative w-full min-h-[80vh] bg-white shadow-lg p-8 mx-auto my-12">
+          <div className="relative w-full min-h-[80vh] bg-white shadow-lg p-8 mx-auto my-12" onClick={e => setSelectedProject(null)}>
             {/* 四个象限背景 */}
             <div className="absolute quadrant-container inset-0 grid grid-cols-2 grid-rows-2">
               <QuadrantBox position="topLeft" />
@@ -1025,12 +1102,13 @@ const Quadrant = () => {
                       transform: `translate(-50%, -50%)`,
                       touchAction: 'none',
                       width: 'auto',
+                      border: project.id === selectedProject?.id ? '2px solid #000' : 'none',
                     }}
                     className={`absolute z-30 ${
                       isVisible ? 'transition-opacity' : 'transition-none'
                     }`}
-                    onDoubleClick={e => handleDoubleClick(e, project)}
-                    onContextMenu={e => handleContextMenu(e, project)}
+                    onClick={e => handleClick(e, project)}
+                    onContextMenu={e => onDelLable(project)}
                   >
                     <ProjectPreview
                       project={project}
@@ -1051,7 +1129,7 @@ const Quadrant = () => {
           {/* 修改编辑标签对话框 */}
           <Dialog.Root
             open={!!editingLabel}
-            onOpenChange={open => !open && setEditingLabel(null)}
+            onOpenChange={open => !open && updateEditLabel(null)}
           >
             <Dialog.Portal>
               <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
@@ -1060,7 +1138,7 @@ const Quadrant = () => {
                   label={editingLabel}
                   onSave={handleLabelSave}
                   setCategoryColors={setCategoryColors}
-                  onClose={() => setEditingLabel(null)}
+                  onClose={() => updateEditLabel(null)}
                 />
               )}
             </Dialog.Portal>
@@ -1097,7 +1175,7 @@ const Quadrant = () => {
         {/* 修改编辑对话框的触发 */}
         <Dialog.Root
           open={!!editingProject}
-          onOpenChange={open => !open && setEditingProject(null)}
+          onOpenChange={open => !open && updateEditProject(null)}
         >
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />

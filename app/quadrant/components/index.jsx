@@ -201,7 +201,7 @@ const Quadrant = () => {
             let index = labels.findIndex(
               l => l.category === selectedProject.category
             );
-            onDelLable(index);
+            onDelLabel(index);
           } else {
             // 删除选中项目
             onDelProject(selectedProject);
@@ -467,7 +467,7 @@ const Quadrant = () => {
     });
   };
 
-  const onDelLable = index => {
+  const onDelLabel = index => {
     Modal.confirm({
       title: '删除确认',
       content: '确定要删除此分类吗？分类下所有项目也会同步删除',
@@ -561,7 +561,7 @@ const Quadrant = () => {
           <ContextMenu.Item
             className="px-2 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded text-red-500"
             onClick={() => {
-              onDelLable(index);
+              onDelLabel(index);
             }}
           >
             删除分类
@@ -1128,7 +1128,7 @@ const Quadrant = () => {
                       isVisible ? 'transition-opacity' : 'transition-none'
                     }`}
                     onClick={e => handleClick(e, project)}
-                    onContextMenu={e => onDelLable(project)}
+                    onContextMenu={e => onDelProject(project)}
                   >
                     <ProjectItem
                       project={project}
